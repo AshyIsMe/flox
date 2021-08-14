@@ -1,0 +1,17 @@
+name = "flox"
+version = "0.1.0"
+license = "license"
+author = "Jane Doe"
+maintainer = "jane.doe@example.com"
+copyright = "Copyright 2021, Jane Doe"
+[build]
+auto-executables = true
+auto-tests = true
+auto-examples = true
+[install]
+library = false
+[dependencies]
+M_CLI = { git = "https://github.com/urbanjost/M_CLI.git" }
+# M_CLI2        = { git = "https://github.com/urbanjost/M_CLI2.git" }
+# fortran_stdlib = { git = "https://github.com/fortran-lang/stdlib.git" }
+functional = { git = "https://github.com/wavebitscientific/functional-fortran" }
