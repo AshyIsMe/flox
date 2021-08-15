@@ -1,6 +1,10 @@
 program main
-  use flox, only: say_hello
+  ! use flox, only: runprompt,line_len
+  use flox, only: runprompt
   implicit none
 
-  call say_hello()
+  ! character(len=line_len) :: line
+  ! character(512) :: line
+  call runprompt()
+
 end program main

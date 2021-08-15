@@ -2,9 +2,17 @@ module flox
   implicit none
   private
 
-  public :: say_hello
+  ! integer,parameter,public :: line_len=512
+
+  public :: runprompt
 contains
-  subroutine say_hello
-    print *, "Hello, flox!"
-  end subroutine say_hello
+  subroutine runprompt
+    character(512) :: line
+    ! character(len=line_len) :: line
+
+    write(*,'(a)', advance="no") "> "
+    read(*,'(a)') line
+    write(*,'(a)') line
+  end subroutine runprompt
+
 end module flox
