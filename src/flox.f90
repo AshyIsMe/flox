@@ -10,9 +10,11 @@ contains
     character(512) :: line
     ! character(len=line_len) :: line
 
-    write(*,'(a)', advance="no") "> "
-    read(*,'(a)') line
-    write(*,'(a)') line
+    INFINITE: do
+      write(*,'(a)', advance="no") "> "
+      read(*,'(a)') line
+      write(*,'(a)') line
+    enddo INFINITE
   end subroutine runprompt
 
 end module flox
