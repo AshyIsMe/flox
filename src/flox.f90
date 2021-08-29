@@ -1,7 +1,10 @@
 module flox
+  use mod_scanner, only: Scanner, Token
+
   implicit none
   private
 
+  ! AA TODO Figure out what to do about array size magic numbers
   ! integer,parameter,public :: line_len=512
 
   public :: runprompt, runfile
@@ -33,8 +36,13 @@ contains
 
   subroutine run (line)
     character(512), intent(in) :: line
+    type(Scanner) :: a_scanner
+    type(Token) :: tokens (10)
 
-    write(*,'(a)') line
+    a_scanner = Scanner(line)
+
+    call a_scanner % scanTokens(tokens)
+    ! write(*,'(a)') line
 
   end subroutine run
 
