@@ -1,5 +1,5 @@
 program main
-  use flox, only: runprompt
+  use flox, only: runprompt, runfile
   use M_CLI,  only : commandline, check_commandline
   implicit none
 
@@ -15,8 +15,8 @@ program main
     !  write(*,*) file
 
   if (file /= "filename") then
-     write(*,*) 'Running file: ',file
-    !  call runfile(file)
+    ! write(*,*) 'Running file: ',file
+    call runfile(file)
   else
     call runprompt()
   end if

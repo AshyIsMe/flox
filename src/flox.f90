@@ -4,7 +4,7 @@ module flox
 
   ! integer,parameter,public :: line_len=512
 
-  public :: runprompt
+  public :: runprompt, runfile
 contains
   subroutine runprompt
     character(512) :: line
@@ -20,9 +20,14 @@ contains
   end subroutine runprompt
 
   subroutine runfile (path)
-    character(1024) :: path
+    character(*) :: path
+    character(512) :: line
 
-  ! TODO readLines file and map(run, lines)
+    open(1, file=path)
+    do
+       read(1, *) line
+       call run(line)
+    end do
 
   end subroutine runfile
 
