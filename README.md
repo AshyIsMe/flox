@@ -12,3 +12,8 @@ Playing around with Modern Fortran and Crafting Interpreters:
 * Install gfortran: `apt install gfortran`
 * Install `fpm` the Fortran Package Manager: https://github.com/fortran-lang/fpm
 * Run flox: `fpm run`
+
+
+## TODO
+
+* argparse: https://gitlab.com/bwearley/f-clap
