@@ -4,16 +4,6 @@ module mod_scanner
 
   implicit none
 
-  type :: Scanner
-     character(512) :: source
-
-     !AA TODO: do we need to add tokens to the Scanner object itself?
-     !type(Token(:)),allocatable :: tokens(:)
-
-   contains
-     procedure, pass(self) :: scanTokens
-  end type Scanner
-
   type :: Token
      character(32) :: token
      !character(len=:),allocatable :: token
@@ -21,6 +11,14 @@ module mod_scanner
      procedure write_token
      generic :: write(unformatted) => write_token
   end type Token
+
+  type :: Scanner
+     character(512) :: source
+     type(Token), allocatable :: tokens(:)
+
+   contains
+     procedure, pass(self) :: scanTokens
+  end type Scanner
 
 contains
 
@@ -33,18 +31,15 @@ contains
     write(unit, iostat=iostat, iomsg=iomsg) dtv%token
   end subroutine write_token
 
-  subroutine scanTokens(self, tokens)
-    class(Scanner), intent(in) :: self
-    type(Token(:)),allocatable, intent(out) :: tokens(:)
-
+  subroutine scanTokens(self)
+    class(Scanner), intent(inout) :: self
+    type(Token(:)),allocatable :: tokens(:)
     character(len=:),allocatable :: words(:)
     integer :: i
 
     call split(self%source, words)
-
-    !print *, 'AA DEBUG: words:', words
-    tokens = [(Token(words(i)), i=1, size(words))]
-    print *, 'DEBUG: tokens within scanTokens(): ', tokens
+    self%tokens = [(Token(words(i)), i=1, size(words))]
+    !print *, 'DEBUG: tokens within scanTokens(): ', self%tokens
 
   end subroutine scanTokens
 

@@ -1,5 +1,5 @@
 module flox
-  use mod_scanner, only: Scanner, Token
+  use mod_scanner, only: Scanner, Token, scanTokens
   use M_strings, only: split
 
   implicit none
@@ -38,17 +38,12 @@ contains
   subroutine run (line)
     character(512), intent(in) :: line
     type(Scanner) :: a_scanner
-    type(Token),allocatable :: tokens(:)
     integer :: i
 
     a_scanner = Scanner(line)
-    call a_scanner%scanTokens(tokens)
+    call scanTokens(a_scanner)
 
-    !AA TODO: Why is tokens not allocated after scanTokens?
-    print *, 'allocated(tokens):', allocated(tokens)
-    if (allocated(tokens)) then
-      print *, 'DEBUG: tokens outside scanTokens(): ', tokens
-    end if
+    print *, 'DEBUG: a_scanner:', a_scanner%tokens
 
   end subroutine run
 
