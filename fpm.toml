@@ -11,7 +11,9 @@ auto-examples = true
 [install]
 library = false
 [dependencies]
-M_CLI = { git = "https://github.com/urbanjost/M_CLI.git" }
 # M_CLI2        = { git = "https://github.com/urbanjost/M_CLI2.git" }
 # fortran_stdlib = { git = "https://github.com/fortran-lang/stdlib.git" }
+M_CLI = { git = "https://github.com/urbanjost/M_CLI.git" }
+M_strings = { git = "https://github.com/urbanjost/M_strings.git" }
 functional = { git = "https://github.com/wavebitscientific/functional-fortran" }
+iso_varying_string = { git = "https://gitlab.com/everythingfunctional/iso_varying_string" }
