@@ -2,5 +2,5 @@
 default:
 
 clean:
-	# rm *.mod
+	rm *.mod || echo 'no mod files found'
 	rm -rf build/gfortran_*
