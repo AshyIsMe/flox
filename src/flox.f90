@@ -47,4 +47,19 @@ contains
 
   end subroutine run
 
+  subroutine error (line, message)
+    integer :: line
+    character(*) :: message
+
+    call report(line, '', message)
+  end subroutine error
+
+  subroutine report (line, s_where, message)
+    integer :: line
+    character(*) :: s_where
+    character(*) :: message
+
+    print *, '[line ', line, '] Error', s_where, ': ', message
+  end subroutine report
+
 end module flox
