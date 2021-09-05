@@ -1,5 +1,5 @@
 module flox
-  use mod_scanner, only: Scanner, Token, scanTokens
+  use mod_scanner, only: Scanner, scanTokens
   use M_strings, only: split
 
   implicit none
