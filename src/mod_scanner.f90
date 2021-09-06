@@ -32,11 +32,11 @@ contains
 
     call split(self%source, words)
     !self%tokens = [(Token(words(i)), i=1, size(words))]
-    !print *, 'DEBUG: tokens within scanTokens(): ', self%tokens
 
-    self%tokens = [(Token(TT_EOF, words(i), 1), i=1, size(words))]
+    self%tokens = [(Token(TT_EOF, words(i), 1), i=1, size(words))] ! TODO
+
     do while (.not. (self%isAtEnd()))
-      self%start = self%current
+      self % start = self % current
       call self%scanToken()
     end do
 
@@ -44,33 +44,31 @@ contains
 
   subroutine scanToken(self)
     class(Scanner), intent(inout) :: self
-      character :: c
+    character :: c
 
-      ! AA TODO:  http://craftinginterpreters.com/scanning.html#recognizing-lexemes
-      call self%advanceChar(c)
+    ! AA TODO:  http://craftinginterpreters.com/scanning.html#recognizing-lexemes
+    call self%advanceChar(c)
 
   end subroutine scanToken
 
   subroutine advanceChar(self, c)
     class(Scanner), intent(inout) :: self
-      character, intent(out) :: c
-      character(512) :: s
-      integer :: i
+    character, intent(out) :: c
+    character(512) :: s
+    integer :: i
 
-      s = self%source
-      i = self%current
-      c = s(i:i)
+    s = self%source
+    i = self%current
+    c = s(i:i)
 
-      self%current = self%current + 1
+    self % current = i + 1
 
   end subroutine advanceChar
 
   logical function isAtEnd(self)
     class(Scanner), intent(in) :: self
-    character(:), allocatable :: s(:)
-    s = self%source
 
-    isAtEnd = (self%current) > size(s)
+    isAtEnd = ((self%current) > len(self%source))
   end function isAtEnd
 
 end module mod_scanner
