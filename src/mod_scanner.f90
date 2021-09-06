@@ -18,6 +18,7 @@ module mod_scanner
     procedure, pass(self) :: scanTokens
     procedure, pass(self) :: scanToken
     procedure, pass(self) :: isAtEnd
+    procedure, pass(self) :: advanceChar
   end type Scanner
 
 
@@ -43,11 +44,26 @@ contains
 
   subroutine scanToken(self)
     class(Scanner), intent(inout) :: self
+      character :: c
 
-      ! AA TODO:  http://craftinginterpreters.com/scanning.html#the-scanner-class
-      self%current = self%current + 1
+      ! AA TODO:  http://craftinginterpreters.com/scanning.html#recognizing-lexemes
+      call self%advanceChar(c)
 
   end subroutine scanToken
+
+  subroutine advanceChar(self, c)
+    class(Scanner), intent(inout) :: self
+      character, intent(out) :: c
+      character(512) :: s
+      integer :: i
+
+      s = self%source
+      i = self%current
+      c = s(i:i)
+
+      self%current = self%current + 1
+
+  end subroutine advanceChar
 
   logical function isAtEnd(self)
     class(Scanner), intent(in) :: self
