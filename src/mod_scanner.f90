@@ -1,5 +1,5 @@
 module mod_scanner
-  use M_strings, only: split
+  use M_strings, only: split, len_white
   !use functional, only: map
   use mod_tokentype
   use mod_token, only: Token
@@ -19,6 +19,7 @@ module mod_scanner
     procedure, pass(self) :: scanToken
     procedure, pass(self) :: isAtEnd
     procedure, pass(self) :: advanceChar
+    procedure, pass(self) :: addToken
   end type Scanner
 
 
@@ -46,8 +47,33 @@ contains
     class(Scanner), intent(inout) :: self
     character :: c
 
-    ! AA TODO:  http://craftinginterpreters.com/scanning.html#recognizing-lexemes
     call self%advanceChar(c)
+
+    print *, c
+    select case (c)
+    case ('(')
+      call self%addToken(TT_LEFT_PAREN)
+    case (')')
+      call self%addToken(TT_RIGHT_PAREN)
+    case ('{')
+      call self%addToken(TT_LEFT_BRACE)
+    case ('}')
+      call self%addToken(TT_RIGHT_BRACE)
+    case (',')
+      call self%addToken(TT_COMMA)
+    case ('.')
+      call self%addToken(TT_DOT)
+    case ('-')
+      call self%addToken(TT_MINUS)
+    case ('+')
+      call self%addToken(TT_PLUS)
+    case ('')
+      call self%addToken(TT_SEMICOLON)
+    case ('*')
+      call self%addToken(TT_STAR)
+    case default
+      call error(self%line, 'Unexpected character.')
+    end select
 
   end subroutine scanToken
 
@@ -68,7 +94,50 @@ contains
   logical function isAtEnd(self)
     class(Scanner), intent(in) :: self
 
-    isAtEnd = ((self%current) > len(self%source))
+    !isAtEnd = ((self%current) > len(self%source))
+    isAtEnd = ((self%current) > len_white(self%source))
   end function isAtEnd
+
+  subroutine addToken(self, tokentype)
+    class(Scanner), intent(inout) :: self
+    !integer(kind(TokenType)) :: tokentype
+    integer :: tokentype
+    type(Token), allocatable :: tmptokens(:)
+    type(Token) :: newtoken
+    integer :: isize
+
+    newtoken = Token(tokentype, self%source(self%start:self%current),self%line)
+
+    if (allocated(self%tokens)) then
+      isize = size(self%tokens)
+      allocate(tmptokens(isize+1))
+      tmptokens(1:isize) = self%tokens(1:isize)
+      tmptokens(isize+1) = newtoken
+
+      deallocate(self%tokens)
+      call move_alloc(tmptokens, self%tokens)
+    else
+      allocate(self%tokens(1))
+      self%tokens(1) = newtoken
+    end if
+
+  end subroutine addToken
+
+  subroutine error (line, message)
+    !According to the book this is in the Lox class instead of Scanner
+    integer :: line
+    character(*) :: message
+
+    call report(line, '', message)
+  end subroutine error
+
+  subroutine report (line, s_where, message)
+    !According to the book this is in the Lox class instead of Scanner
+    integer :: line
+    character(*) :: s_where
+    character(*) :: message
+
+    print *, '[line ', line, '] Error', s_where, ': ', message
+  end subroutine report
 
 end module mod_scanner
