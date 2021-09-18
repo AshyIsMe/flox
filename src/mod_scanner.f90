@@ -12,7 +12,7 @@ module mod_scanner
   type :: Scanner
     character(512) :: source ! TODO use iso_varying_string
     type(Token), allocatable :: tokens(:)
-    integer :: start=0, current=0, line=1
+    integer :: start=1, current=1, line=1
 
   contains
     procedure, pass(self) :: addToken
@@ -51,7 +51,6 @@ contains
     character :: c
     logical :: bmatch = .false.
 
-    ! AA TODO: There's a bug here currently. Parsing the first (single char) token twice
     call self%advanceChar(c)
 
     !print *, c
@@ -144,14 +143,8 @@ contains
     class(Scanner), intent(inout) :: self
     character, intent(out) :: c
 
-    if (self%start == 0 .and. self%current == 0) then
-      self%start = 1
-      self%current = 1
-      c = self%source(self%current:self%current)
-    else
-      c = self%source(self%current:self%current)
-      self%current = self%current + 1
-    end if
+    c = self%source(self%current:self%current)
+    self%current = self%current + 1
   end subroutine advanceChar
 
   character function peek(self)
@@ -187,7 +180,7 @@ contains
     type(Token) :: newtoken
     integer :: isize
 
-    newtoken = Token(tokentype, self%source(self%start:self%current),self%line)
+    newtoken = Token(tokentype, self%source(self%start:self%current-1),self%line)
 
     if (allocated(self%tokens)) then
       isize = size(self%tokens)
