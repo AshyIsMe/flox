@@ -69,7 +69,7 @@ contains
       call self%addToken(TT_MINUS)
     case ('+')
       call self%addToken(TT_PLUS)
-    case ('')
+    case (';')
       call self%addToken(TT_SEMICOLON)
     case ('*')
       call self%addToken(TT_STAR)

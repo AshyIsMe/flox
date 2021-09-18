@@ -43,7 +43,8 @@ contains
     a_scanner = Scanner(line)
     call scanTokens(a_scanner)
 
-    print *, 'DEBUG: a_scanner:', a_scanner%tokens
+    print *, 'DEBUG: size(a_scanner%tokens):', size(a_scanner%tokens)
+    print *, 'DEBUG: a_scanner%tokens:', a_scanner%tokens
 
   end subroutine run
 
