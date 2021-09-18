@@ -26,7 +26,9 @@ contains
     integer, intent(out) :: iostat
     character(*), intent(inout) :: iomsg
 
-    write(unit, iostat=iostat, iomsg=iomsg) dtv%token
+    !write(unit, iostat=iostat, iomsg=iomsg) dtv%token
+    ! AA TODO: This doesn't currently seem to work when we print the scanner%tokens array
+    write(unit, iostat=iostat, iomsg=iomsg, fmt=*) 'Token[' // tt_tostring(dtv%token) // ']'
   end subroutine write_token
 
 end module mod_token

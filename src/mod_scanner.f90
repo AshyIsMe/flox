@@ -15,13 +15,14 @@ module mod_scanner
     integer :: start=1, current=1, line=1
 
   contains
-    procedure, pass(self) :: scanTokens
-    procedure, pass(self) :: scanToken
-    procedure, pass(self) :: isAtEnd
-    procedure, pass(self) :: advanceChar
     procedure, pass(self) :: addToken
+    procedure, pass(self) :: advanceChar
+    procedure, pass(self) :: isAtEnd
     procedure, pass(self) :: match
     procedure, pass(self) :: peek
+    procedure, pass(self) :: scanToken
+    procedure, pass(self) :: scanTokens
+    procedure, pass(self) :: string
   end type Scanner
 
 
@@ -34,9 +35,7 @@ contains
     integer :: i
 
     call split(self%source, words)
-    !self%tokens = [(Token(words(i)), i=1, size(words))]
-
-    self%tokens = [(Token(TT_EOF, words(i), 1), i=1, size(words))] ! TODO
+    allocate(self%tokens(0))
 
     do while (.not. (self%isAtEnd()))
       self % start = self % current
@@ -125,6 +124,9 @@ contains
     case (new_line('a'))
       self%line = self%line + 1
 
+    case ('"')
+      call self%string()
+
     case default
       call error(self%line, 'Unexpected character: ' // c)
     end select
@@ -202,6 +204,26 @@ contains
     self%current = self%current + 1
     bmatch = .true.
   end subroutine match
+
+  subroutine string(self)
+    class(Scanner), intent(inout) :: self
+    character :: c
+
+    do while(self%peek() /= '"' .and. .not. self%isAtEnd())
+      if (self%peek() == new_line('a')) then
+        self%line = self%line + 1
+      end if
+      call self%advanceChar(c)
+    end do
+
+    if (self%isAtEnd()) then
+      call error(self%line, 'Unterminated string.')
+      return
+    end if
+
+    call self%advanceChar(c) ! Eat the closing " char
+    call self%addToken(TT_STRING)
+  end subroutine string
 
   subroutine error (line, message)
     !According to the book this is in the Lox class instead of Scanner
