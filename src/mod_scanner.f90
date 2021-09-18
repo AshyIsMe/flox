@@ -1,5 +1,5 @@
 module mod_scanner
-  use M_strings, only: split, len_white
+  use M_strings, only: split, len_white, isdigit
   !use functional, only: map
   use mod_tokentype
   use mod_token, only: Token
@@ -12,7 +12,7 @@ module mod_scanner
   type :: Scanner
     character(512) :: source ! TODO use iso_varying_string
     type(Token), allocatable :: tokens(:)
-    integer :: start=1, current=1, line=1
+    integer :: start=0, current=0, line=1
 
   contains
     procedure, pass(self) :: addToken
@@ -20,9 +20,11 @@ module mod_scanner
     procedure, pass(self) :: isAtEnd
     procedure, pass(self) :: match
     procedure, pass(self) :: peek
+    procedure, pass(self) :: peekNext
     procedure, pass(self) :: scanToken
     procedure, pass(self) :: scanTokens
-    procedure, pass(self) :: string
+    procedure, pass(self) :: tokenizeString
+    procedure, pass(self) :: tokenizeNumber
   end type Scanner
 
 
@@ -49,6 +51,7 @@ contains
     character :: c
     logical :: bmatch = .false.
 
+    ! AA TODO: There's a bug here currently. Parsing the first (single char) token twice
     call self%advanceChar(c)
 
     !print *, c
@@ -125,10 +128,14 @@ contains
       self%line = self%line + 1
 
     case ('"')
-      call self%string()
+      call self%tokenizeString()
 
     case default
-      call error(self%line, 'Unexpected character: ' // c)
+      if (isdigit(c)) then
+        call self%tokenizeNumber()
+      else
+        call error(self%line, 'Unexpected character: ' // c)
+      end if
     end select
 
   end subroutine scanToken
@@ -136,25 +143,34 @@ contains
   subroutine advanceChar(self, c)
     class(Scanner), intent(inout) :: self
     character, intent(out) :: c
-    character(512) :: s
-    integer :: i
 
-    s = self%source
-    i = self%current
-    c = s(i:i)
-
-    self % current = i + 1
-
+    if (self%start == 0 .and. self%current == 0) then
+      self%start = 1
+      self%current = 1
+      c = self%source(self%current:self%current)
+    else
+      c = self%source(self%current:self%current)
+      self%current = self%current + 1
+    end if
   end subroutine advanceChar
 
   character function peek(self)
     class(Scanner), intent(inout) :: self
 
     if (self%isAtEnd()) then
-      peek = achar(0) ! AA TODO: fix this
+      peek = achar(0)
     end if
     peek = self%source(self%current:self%current)
   end function peek
+
+  character function peekNext(self)
+    class(Scanner), intent(inout) :: self
+
+    if (self%current + 1 >= len_white(self%source)) then
+      peekNext = achar(0)
+    end if
+    peekNext = self%source(self%current+1:self%current+1)
+  end function peekNext
 
   logical function isAtEnd(self)
     class(Scanner), intent(in) :: self
@@ -205,7 +221,7 @@ contains
     bmatch = .true.
   end subroutine match
 
-  subroutine string(self)
+  subroutine tokenizeString(self)
     class(Scanner), intent(inout) :: self
     character :: c
 
@@ -223,7 +239,26 @@ contains
 
     call self%advanceChar(c) ! Eat the closing " char
     call self%addToken(TT_STRING)
-  end subroutine string
+  end subroutine tokenizeString
+
+  subroutine tokenizeNumber(self)
+    class(Scanner), intent(inout) :: self
+    character :: c
+
+    do while (isdigit(self%peek()))
+      call self%advanceChar(c)
+    end do
+
+    if (self%peek() == '.' .and. isdigit(self%peekNext())) then
+      call self%advanceChar(c) ! Consume the '.'
+
+      do while (isdigit(self%peek()))
+        call self%advanceChar(c)
+      end do
+    end if
+
+    call self%addToken(TT_NUMBER)
+  end subroutine tokenizeNumber
 
   subroutine error (line, message)
     !According to the book this is in the Lox class instead of Scanner
