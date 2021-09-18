@@ -21,6 +21,7 @@ module mod_scanner
     procedure, pass(self) :: advanceChar
     procedure, pass(self) :: addToken
     procedure, pass(self) :: match
+    procedure, pass(self) :: peek
   end type Scanner
 
 
@@ -106,9 +107,26 @@ contains
         call self%addToken(TT_GREATER)
       end if
 
+    case ('/')
+      call self%match('/', bmatch)
+      if (bmatch) then
+        ! Comment until end of line
+        do while (self%peek() /= new_line('a') .and. .not. self%isAtEnd())
+          call self%advanceChar(c)
+        end do
+      else
+        call self%addToken(TT_SLASH)
+      end if
+
+    case (' ', achar(13), achar(9))
+      ! Eat whitespace ' ', '\r', '\t'
+      continue
+
+    case (new_line('a'))
+      self%line = self%line + 1
 
     case default
-      call error(self%line, 'Unexpected character.')
+      call error(self%line, 'Unexpected character: ' // c)
     end select
 
   end subroutine scanToken
@@ -126,6 +144,15 @@ contains
     self % current = i + 1
 
   end subroutine advanceChar
+
+  character function peek(self)
+    class(Scanner), intent(inout) :: self
+
+    if (self%isAtEnd()) then
+      peek = achar(0) ! AA TODO: fix this
+    end if
+    peek = self%source(self%current:self%current)
+  end function peek
 
   logical function isAtEnd(self)
     class(Scanner), intent(in) :: self
