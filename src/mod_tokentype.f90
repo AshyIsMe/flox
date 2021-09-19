@@ -28,6 +28,8 @@ module mod_tokentype
 
     enumerator :: TT_EOF
 
+    enumerator :: TT_INVALID_KEYWORD ! Not a real token. Just to signal Scanner
+
   end enum
 
   contains
@@ -83,5 +85,32 @@ module mod_tokentype
       end select
     end function
 
+    function keywordToken(keyword) result(res)
+      !character(len=:), allocatable, intent(in) :: keyword
+      character(*), intent(in) :: keyword
+      integer(kind(TokenType)) :: res
+
+      select case (keyword)
+      case('and');    res=TT_AND
+      case('class');  res=TT_CLASS
+      case('else');   res=TT_ELSE
+      case('false');  res=TT_FALSE
+      case('fun');    res=TT_FUN
+      case('for');    res=TT_FOR
+      case('if');     res=TT_IF
+      case('nil');    res=TT_NIL
+      case('or');     res=TT_OR
+      case('print');  res=TT_PRINT
+      case('return'); res=TT_RETURN
+      case('super');  res=TT_SUPER
+      case('this');   res=TT_THIS
+      case('true');   res=TT_TRUE
+      case('var');    res=TT_VAR
+      case('while');  res=TT_WHILE
+      case default
+        res=TT_INVALID_KEYWORD
+      end select
+
+    end function
 
 end module mod_tokentype

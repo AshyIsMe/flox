@@ -1,5 +1,5 @@
 module mod_scanner
-  use M_strings, only: split, len_white, isdigit
+  use M_strings, only: split, len_white, isdigit, isalpha
   !use functional, only: map
   use mod_tokentype
   use mod_token, only: Token
@@ -25,6 +25,7 @@ module mod_scanner
     procedure, pass(self) :: scanTokens
     procedure, pass(self) :: tokenizeString
     procedure, pass(self) :: tokenizeNumber
+    procedure, pass(self) :: tokenizeIdentifier
   end type Scanner
 
 
@@ -132,6 +133,8 @@ contains
     case default
       if (isdigit(c)) then
         call self%tokenizeNumber()
+      else if (isalpha(c) .or. c == '_') then
+        call self%tokenizeIdentifier()
       else
         call error(self%line, 'Unexpected character: ' // c)
       end if
@@ -171,6 +174,11 @@ contains
     !isAtEnd = ((self%current) > len(self%source))
     isAtEnd = ((self%current) > len_white(self%source))
   end function isAtEnd
+
+  logical function isAlphaNumeric(c)
+    character :: c
+    isAlphaNumeric = isalpha(c) .or. c == '_' .or. isdigit(c)
+  end function isAlphaNumeric
 
   subroutine addToken(self, tokentype)
     class(Scanner), intent(inout) :: self
@@ -252,6 +260,24 @@ contains
 
     call self%addToken(TT_NUMBER)
   end subroutine tokenizeNumber
+
+  subroutine tokenizeIdentifier(self)
+    class(Scanner), intent(inout) :: self
+    character :: c
+    integer(kind(TokenType)) :: tt
+
+    do while (isAlphaNumeric(self%peek()))
+      call self%advanceChar(c)
+    end do
+
+    tt = keywordToken(self%source(self%start:self%current-1))
+    if (tt == TT_INVALID_KEYWORD) then
+      tt = TT_IDENTIFIER
+    end if
+
+    call self%addToken(tt)
+  end subroutine tokenizeIdentifier
+
 
   subroutine error (line, message)
     !According to the book this is in the Lox class instead of Scanner
