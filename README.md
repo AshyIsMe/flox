@@ -1,10 +1,16 @@
 # flox - Crafting Interpreters in Modern Fortran
 
-Playing around with Modern Fortran and Crafting Interpreters:
+Playing around with Crafting Interpreters in Fortran (with Modern Fortran for reference):
 
 
 * http://craftinginterpreters.com/
 * https://www.manning.com/books/modern-fortran
+
+## Status
+
+* Part II. A Tree-Walk Interpreter
+  * Scanning: DONE
+  * Representing Code: TODO
 
 
 ## Quickstart
@@ -16,4 +22,5 @@ Playing around with Modern Fortran and Crafting Interpreters:
 
 ## TODO
 
+* `iso_varying_string`: `https://gitlab.com/everythingfunctional/iso_varying_string`
 * argparse: https://gitlab.com/bwearley/f-clap
